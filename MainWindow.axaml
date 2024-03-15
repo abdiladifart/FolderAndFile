@@ -1,0 +1,15 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:FileSystemApp;assembly=FileSystemApp"
+        x:Class="FileSystemApp.MainWindow"
+        Title="File System App" Width="800" Height="600">
+    <StackPanel>
+        <Button Content="Copy File" Click="CopyFile_Click"/>
+        <Button Content="Move File" Click="MoveFile_Click"/>
+        <Button Content="Copy Folder" Click="CopyFolder_Click"/>
+        <Button Content="Move Folder" Click="MoveFolder_Click"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <TextBox Name="MessageTextBox" IsReadOnly="True" Margin="10"/>
+        </ScrollViewer>
+    </StackPanel>
+</Window>
