@@ -4,12 +4,24 @@
         x:Class="FileSystemApp.MainWindow"
         Title="File System App" Width="800" Height="600">
     <StackPanel>
-        <Button Content="Copy File" Click="CopyFile_Click"/>
-        <Button Content="Move File" Click="MoveFile_Click"/>
-        <Button Content="Copy Folder" Click="CopyFolder_Click"/>
-        <Button Content="Move Folder" Click="MoveFolder_Click"/>
+        <!-- Text boxes for entering file and folder names -->
+        <StackPanel Orientation="Horizontal">
+            <TextBox Name="FileNameTextBox" Width="200" Margin="5" Watermark="Enter file name"/>
+            <Button Content="Create File" Click="CreateFile_Click"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Name="FolderNameTextBox" Width="200" Margin="5" Watermark="Enter folder name"/>
+            <Button Content="Create Folder" Click="CreateFolder_Click"/>
+        </StackPanel>
+        <!-- Buttons for copying and moving files/folders -->
+        <StackPanel Orientation="Horizontal">
+            <Button Content="Copy" Click="Copy_Click"/>
+            <Button Content="Move" Click="Move_Click"/>
+            <Button Content="List Files and Folders" Click="ListFilesAndFolders_Click"/>
+        </StackPanel>
+        <!-- Text block for displaying messages -->
         <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <TextBox Name="MessageTextBox" IsReadOnly="True" Margin="10"/>
+            <TextBlock Name="MessageTextBlock" Margin="10"/>
         </ScrollViewer>
     </StackPanel>
 </Window>

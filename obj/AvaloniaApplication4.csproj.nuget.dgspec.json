@@ -1,25 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "/Users/lutfi/RiderProjects/AvaloniaApplication4/AvaloniaApplication4/AvaloniaApplication4.csproj": {}
+    "C:\\Users\\abdil\\RiderProjects\\FolderAndFile\\AvaloniaApplication4.csproj": {}
   },
   "projects": {
-    "/Users/lutfi/RiderProjects/AvaloniaApplication4/AvaloniaApplication4/AvaloniaApplication4.csproj": {
+    "C:\\Users\\abdil\\RiderProjects\\FolderAndFile\\AvaloniaApplication4.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/lutfi/RiderProjects/AvaloniaApplication4/AvaloniaApplication4/AvaloniaApplication4.csproj",
+        "projectUniqueName": "C:\\Users\\abdil\\RiderProjects\\FolderAndFile\\AvaloniaApplication4.csproj",
         "projectName": "AvaloniaApplication4",
-        "projectPath": "/Users/lutfi/RiderProjects/AvaloniaApplication4/AvaloniaApplication4/AvaloniaApplication4.csproj",
-        "packagesPath": "/Users/lutfi/.nuget/packages/",
-        "outputPath": "/Users/lutfi/RiderProjects/AvaloniaApplication4/AvaloniaApplication4/obj/",
+        "projectPath": "C:\\Users\\abdil\\RiderProjects\\FolderAndFile\\AvaloniaApplication4.csproj",
+        "packagesPath": "C:\\Users\\abdil\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\abdil\\RiderProjects\\FolderAndFile\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/lutfi/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\abdil\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -75,7 +82,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

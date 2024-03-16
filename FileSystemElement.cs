@@ -7,7 +7,7 @@ namespace FileSystemApp
     {
         // Properties
         public string Name { get; }
-        public string FolderLocation { get; }
+        public string FolderLocation { get; set; }
         public abstract string Location { get; }
         public abstract FileSystemType Type { get; }
         public abstract long Size { get; }
@@ -18,7 +18,12 @@ namespace FileSystemApp
             Name = name;
             FolderLocation = folderLocation;
         }
-
+        
+        // Method to update the folder location
+        public void UpdateFolderLocation(string folderLocation)
+        {
+            FolderLocation = folderLocation;
+        }
         // Static method for copying an object to another folder
         public static void CopyTo(FileSystemElement element, string destinationFolder)
         {

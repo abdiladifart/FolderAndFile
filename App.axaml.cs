@@ -1,24 +1,32 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using System.Collections.Generic;
 using FileSystemApp;
 
-namespace AvaloniaApplication4;
-
-public partial class App : Application
+namespace AvaloniaApplication4
 {
-    public override void Initialize()
+    public partial class App : Application
     {
-        AvaloniaXamlLoader.Load(this);
-    }
-
-    public override void OnFrameworkInitializationCompleted()
-    {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        public override void Initialize()
         {
-            desktop.MainWindow = new MainWindow();
+            AvaloniaXamlLoader.Load(this);
         }
 
-        base.OnFrameworkInitializationCompleted();
+        public override void OnFrameworkInitializationCompleted()
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                // Create a list of folders
+                List<Folder> folders = new List<Folder>();
+
+                // Add folders to the list...
+                
+                // Create the MainWindow instance with the list of folders
+                desktop.MainWindow = new MainWindow(folders);
+            }
+
+            base.OnFrameworkInitializationCompleted();
+        }
     }
 }

@@ -3,116 +3,235 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FileSystemApp
 {
     public partial class MainWindow : Window
     {
-        private string _selectedFile;
-        private string _selectedFolder;
-        private string _destinationFolder;
+        private TextBlock _messageTextBlock;
+        private TextBox _fileNameTextBox;
+        private TextBox _folderNameTextBox;
+        private List<Folder> _folders; // Collection of folders
 
-        private TextBox _messageTextBox;
-
-        public MainWindow()
+        public MainWindow(List<Folder> folders) // Constructor with folders parameter
         {
+            _folders = folders; // Set the _folders collection
             InitializeComponent();
-#if DEBUG
-            this.AttachDevTools();
-#endif
-
-            _messageTextBox = this.Find<TextBox>("MessageTextBox");
         }
 
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+            _messageTextBlock = this.Find<TextBlock>("MessageTextBlock");
+            _fileNameTextBox = this.FindControl<TextBox>("FileNameTextBox");
+            _folderNameTextBox = this.FindControl<TextBox>("FolderNameTextBox");
         }
 
-        private async void CopyFile_Click(object sender, RoutedEventArgs e)
+        private void CreateFile_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.AllowMultiple = false;
-            _selectedFile = (await dialog.ShowAsync(this)).ToString();
-
-            if (_selectedFile != null)
+            if (_fileNameTextBox != null && _folderNameTextBox != null)
             {
-                // Here you can implement logic to select a destination folder
-                // For example, you can use OpenFolderDialog to select a destination folder
-                OpenFolderDialog folderDialog = new OpenFolderDialog();
-                _destinationFolder = await folderDialog.ShowAsync(this);
+                string fileName = _fileNameTextBox.Text;
+                string folderName = _folderNameTextBox.Text;
 
-                if (_destinationFolder != null)
+                if (!string.IsNullOrWhiteSpace(fileName) && !string.IsNullOrWhiteSpace(folderName))
                 {
-                    File file = new File(System.IO.Path.GetFileName(_selectedFile), null, 1024); // Placeholder size
-                    _messageTextBox.Text += $"Copying file '{System.IO.Path.GetFileName(_selectedFile)}' to '{_destinationFolder}'...{Environment.NewLine}";
-                    FileSystemElement.CopyTo(file, _destinationFolder);
+                    // Check if the folder exists
+                    Folder folder = GetFolder(folderName);
+                    if (folder != null)
+                    {
+                        // Create the file in the selected folder
+                        File file = new File(fileName, folder.Location, 1024); // Assuming file size is not needed for creation
+                        folder.AddElement(file);
+
+                        _messageTextBlock.Text += $"File '{fileName}' created in folder '{folderName}'.{Environment.NewLine}";
+                    }
+                    else
+                    {
+                        _messageTextBlock.Text += $"Folder '{folderName}' not found.{Environment.NewLine}";
+                    }
                 }
+                else
+                {
+                    _messageTextBlock.Text += "Please enter both file name and folder name to create a file.{Environment.NewLine}";
+                }
+            }
+            else
+            {
+                _messageTextBlock.Text += "FileNameTextBox or FolderNameTextBox control is null.{Environment.NewLine}";
             }
         }
 
-        private async void MoveFile_Click(object sender, RoutedEventArgs e)
+
+        private void CreateFolder_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.AllowMultiple = false;
-            _selectedFile = (await dialog.ShowAsync(this)).ToString();
-
-            if (_selectedFile != null)
+            if (_folderNameTextBox != null && !string.IsNullOrEmpty(_folderNameTextBox.Text))
             {
-                // Here you can implement logic to select a destination folder
-                // For example, you can use OpenFolderDialog to select a destination folder
-                OpenFolderDialog folderDialog = new OpenFolderDialog();
-                _destinationFolder = await folderDialog.ShowAsync(this);
-
-                if (_destinationFolder != null)
-                {
-                    File file = new File(System.IO.Path.GetFileName(_selectedFile), null, 1024); // Placeholder size
-                    _messageTextBox.Text += $"Moving file '{System.IO.Path.GetFileName(_selectedFile)}' to '{_destinationFolder}'...{Environment.NewLine}";
-                    FileSystemElement.MoveTo(file, _destinationFolder);
-                }
+                string folderName = _folderNameTextBox.Text;
+        
+                // Create the folder
+                Folder newFolder = new Folder(folderName, null); // Assuming folder location is not needed for creation
+        
+                // Add the folder to the collection
+                _folders.Add(newFolder);
+        
+                _messageTextBlock.Text += $"Folder '{folderName}' created.{Environment.NewLine}";
+            }
+            else
+            {
+                _messageTextBlock.Text += "Please enter a valid folder name.{Environment.NewLine}";
             }
         }
 
-        private async void CopyFolder_Click(object sender, RoutedEventArgs e)
+
+        private void Copy_Click(object sender, RoutedEventArgs e)
         {
-            OpenFolderDialog folderDialog = new OpenFolderDialog();
-            _selectedFolder = await folderDialog.ShowAsync(this);
-
-            if (_selectedFolder != null)
+            if (!string.IsNullOrEmpty(_fileNameTextBox.Text) && !string.IsNullOrEmpty(_folderNameTextBox.Text))
             {
-                // Here you can implement logic to select a destination folder
-                // For example, you can use OpenFolderDialog to select a destination folder
-                OpenFolderDialog destinationDialog = new OpenFolderDialog();
-                _destinationFolder = await destinationDialog.ShowAsync(this);
+                string fileName = _fileNameTextBox.Text;
+                string folderName = _folderNameTextBox.Text;
 
-                if (_destinationFolder != null)
+                // Find the folder where the file exists
+                Folder sourceFolder = GetFolderContainingFile(fileName);
+                if (sourceFolder != null)
                 {
-                    Folder folder = new Folder(System.IO.Path.GetFileName(_selectedFolder), null); // Placeholder for folder location
-                    _messageTextBox.Text += $"Copying folder '{System.IO.Path.GetFileName(_selectedFolder)}' to '{_destinationFolder}'...{Environment.NewLine}";
-                    FileSystemElement.CopyTo(folder, _destinationFolder);
+                    // Find the destination folder
+                    Folder destinationFolder = GetFolder(folderName);
+                    if (destinationFolder != null)
+                    {
+                        // Find the file to copy
+                        File fileToCopy = sourceFolder.ListFiles().FirstOrDefault(file => file.Name == fileName);
+                        if (fileToCopy != null)
+                        {
+                            // Create a new File object for the copied file
+                            File copiedFile = new File(fileName, destinationFolder.Location, fileToCopy.Size);
+
+                            // Use the AddElement method to add the copied file to the destination folder
+                            destinationFolder.AddElement(copiedFile);
+
+                            _messageTextBlock.Text += $"Copying file '{fileName}' to folder '{folderName}'...{Environment.NewLine}";
+                        }
+                        else
+                        {
+                            _messageTextBlock.Text += $"File '{fileName}' not found in folder '{sourceFolder.Name}'.{Environment.NewLine}";
+                        }
+                    }
+                    else
+                    {
+                        _messageTextBlock.Text += $"Destination folder '{folderName}' not found.{Environment.NewLine}";
+                    }
                 }
+                else
+                {
+                    _messageTextBlock.Text += $"File '{fileName}' not found in any folder.{Environment.NewLine}";
+                }
+            }
+            else
+            {
+                _messageTextBlock.Text += "Please enter a valid file name and folder name to copy.{Environment.NewLine}";
             }
         }
 
-        private async void MoveFolder_Click(object sender, RoutedEventArgs e)
+        private void Move_Click(object sender, RoutedEventArgs e)
         {
-            OpenFolderDialog folderDialog = new OpenFolderDialog();
-            _selectedFolder = await folderDialog.ShowAsync(this);
-
-            if (_selectedFolder != null)
+            if (!string.IsNullOrEmpty(_fileNameTextBox.Text) && !string.IsNullOrEmpty(_folderNameTextBox.Text))
             {
-                // Here you can implement logic to select a destination folder
-                // For example, you can use OpenFolderDialog to select a destination folder
-                OpenFolderDialog destinationDialog = new OpenFolderDialog();
-                _destinationFolder = await destinationDialog.ShowAsync(this);
+                string fileName = _fileNameTextBox.Text;
+                string folderName = _folderNameTextBox.Text;
 
-                if (_destinationFolder != null)
+                // Find the folder where the file exists
+                Folder sourceFolder = GetFolderContainingFile(fileName);
+                if (sourceFolder != null)
                 {
-                    Folder folder = new Folder(System.IO.Path.GetFileName(_selectedFolder), null); // Placeholder for folder location
-                    _messageTextBox.Text += $"Moving folder '{System.IO.Path.GetFileName(_selectedFolder)}' to '{_destinationFolder}'...{Environment.NewLine}";
-                    FileSystemElement.MoveTo(folder, _destinationFolder);
+                    // Find the destination folder
+                    Folder destinationFolder = GetFolder(folderName);
+                    if (destinationFolder != null)
+                    {
+                        // Find the file to move
+                        File fileToMove = sourceFolder.ListFiles().FirstOrDefault(file => file.Name == fileName);
+                        if (fileToMove != null)
+                        {
+                            // Move the file to the destination folder
+                            sourceFolder.MoveFileToFolder(fileToMove, destinationFolder);
+
+                            _messageTextBlock.Text += $"Moving file '{fileName}' to folder '{folderName}'...{Environment.NewLine}";
+                        }
+                        else
+                        {
+                            _messageTextBlock.Text += $"File '{fileName}' not found in folder '{sourceFolder.Name}'.{Environment.NewLine}";
+                        }
+                    }
+                    else
+                    {
+                        _messageTextBlock.Text += $"Destination folder '{folderName}' not found.{Environment.NewLine}";
+                    }
+                }
+                else
+                {
+                    _messageTextBlock.Text += $"File '{fileName}' not found in any folder.{Environment.NewLine}";
                 }
             }
+            else
+            {
+                _messageTextBlock.Text +=
+                    "Please enter a valid file name and folder name to move.{Environment.NewLine}";
+            }
+        }
+
+        private Folder GetFolderContainingFile(string fileName)
+        {
+            foreach (var folder in _folders)
+            {
+                if (folder.ListFiles().Any(file => file.Name == fileName))
+                {
+                    return folder;
+                }
+            }
+            return null;
+        }
+
+        private void ListFilesAndFolders_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(_folderNameTextBox.Text))
+            {
+                string folderName = _folderNameTextBox.Text;
+                Folder folder = GetFolder(folderName);
+                if (folder != null)
+                {
+                    _messageTextBlock.Text += $"Files and folders in folder '{folderName}':{Environment.NewLine}";
+                    foreach (var file in folder.ListFiles())
+                    {
+                        _messageTextBlock.Text += $"{file.Name} - File | Location: {file.Location}{Environment.NewLine}";
+                    }
+                    foreach (var subfolder in folder.ListSubFolders())
+                    {
+                        _messageTextBlock.Text += $"{subfolder.Name} - Folder | Location: {subfolder.Location}{Environment.NewLine}";
+                    }
+                    _messageTextBlock.Text += $"Total size: {folder.Size} bytes{Environment.NewLine}";
+                }
+                else
+                {
+                    _messageTextBlock.Text += $"Folder '{folderName}' not found.{Environment.NewLine}";
+                }
+            }
+            else
+            {
+                _messageTextBlock.Text += "Please enter a folder name to list its files and folders.{Environment.NewLine}";
+            }
+        }
+
+        private Folder GetFolder(string folderName)
+        {
+            foreach (var folder in _folders)
+            {
+                if (folder.Name == folderName)
+                {
+                    return folder;
+                }
+            }
+            return null;
         }
     }
 }
